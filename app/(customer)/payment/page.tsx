@@ -10,10 +10,10 @@ import { formatRupiah } from "@/lib/utils";
 import { RESTAURANT_NAME } from "@/lib/constants";
 
 const EWALLETS = [
-  { id: "gopay", name: "GoPay", desc: "Buka aplikasi GoPay langsung · Bebas Biaya", color: "bg-[#00AA13]" },
-  { id: "ovo", name: "OVO", desc: "Push notifikasi ke ponsel Anda", color: "bg-[#4C3494]" },
-  { id: "dana", name: "DANA", desc: "Verifikasi otomatis · Saldo terhubung", color: "bg-[#108EE9]" },
-  { id: "shopeepay", name: "ShopeePay", desc: "Cashback koin · Buka aplikasi", color: "bg-[#EE4D2D]" },
+  { id: "gopay", name: "GoPay", desc: "Buka aplikasi GoPay langsung · Bebas Biaya", logo: "/images/gopay-logo.jpg" },
+  { id: "ovo", name: "OVO", desc: "Push notifikasi ke ponsel Anda", logo: "/images/ovo-logo.jpg" },
+  { id: "dana", name: "DANA", desc: "Verifikasi otomatis · Saldo terhubung", logo: "/images/dana-logo.jpg" },
+  { id: "shopeepay", name: "ShopeePay", desc: "Cashback koin · Buka aplikasi", logo: "/images/shopeepay-logo.jpg" },
 ];
 
 const VA_OPTIONS = [
