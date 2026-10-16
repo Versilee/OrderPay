@@ -8,19 +8,20 @@ import { useSession } from "@/context/SessionContext";
 import { useOrder, markPaid } from "@/lib/order-store";
 import { formatRupiah } from "@/lib/utils";
 import { RESTAURANT_NAME } from "@/lib/constants";
+import Image from "next/image";
 
 const EWALLETS = [
-  { id: "gopay", name: "GoPay", desc: "Buka aplikasi GoPay langsung · Bebas Biaya", logo: "/images/gopay-logo.jpg" },
-  { id: "ovo", name: "OVO", desc: "Push notifikasi ke ponsel Anda", logo: "/images/ovo-logo.jpg" },
-  { id: "dana", name: "DANA", desc: "Verifikasi otomatis · Saldo terhubung", logo: "/images/dana-logo.jpg" },
-  { id: "shopeepay", name: "ShopeePay", desc: "Cashback koin · Buka aplikasi", logo: "/images/shopeepay-logo.jpg" },
+  { id: "gopay", name: "GoPay", desc: "Buka aplikasi GoPay langsung · Bebas Biaya", logo: "/images/payment/logo_gopay.png" },
+  { id: "ovo", name: "OVO", desc: "Push notifikasi ke ponsel Anda", logo: "/images/payment/logo_ovo.png" },
+  { id: "dana", name: "DANA", desc: "Verifikasi otomatis · Saldo terhubung", logo: "/images/payment/logo_dana.png" },
+  { id: "shopeepay", name: "ShopeePay", desc: "Cashback koin · Buka aplikasi", logo: "/images/payment/logo_shoopepay.png" },
 ];
 
 const VA_OPTIONS = [
-  { id: "bca", name: "BCA mobile / myBCA", desc: "Virtual Account 014892188 · Cek Otomatis" },
-  { id: "mandiri", name: "Mandiri Livin'", desc: "Koneksi Mandiri biller · Verifikasi instan" },
-  { id: "bri", name: "BRImo", desc: "BRIVA terhubung otomatis" },
-  { id: "bni", name: "BNI Mobile Banking", desc: "Virtual Account 988892188" },
+  { id: "bca", name: "BCA mobile / myBCA", desc: "Virtual Account 014892188 · Cek Otomatis", logo: "/images/payment/logo_bca.png" },
+  { id: "mandiri", name: "Mandiri Livin'", desc: "Koneksi Mandiri biller · Verifikasi instan", logo: "/images/payment/logo_mandiri.png"},
+  { id: "bri", name: "BRImo", desc: "BRIVA terhubung otomatis", logo: "/images/payment/logo_bri.png"},
+  { id: "bni", name: "BNI Mobile Banking", desc: "Virtual Account 988892188", logo: "/images/payment/logo_bni.png"},
 ];
 
 export default function PaymentEwalletPage() {
@@ -131,8 +132,8 @@ export default function PaymentEwalletPage() {
                 selected === w.id ? "border-brand-700 bg-brand-50/50" : "border-neutral-200 bg-white"
               }`}
             >
-              <span className={`flex h-9 w-9 items-center justify-center rounded-xl text-white text-xs font-bold ${w.color}`}>
-                {w.name[0]}
+              <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-white">
+                <Image src={w.logo} alt={w.name} fill sizes="36px" className="object-contain p-1" />
               </span>
               <span className="flex-1">
                 <span className="block text-sm font-semibold text-neutral-900">{w.name}</span>
@@ -160,8 +161,8 @@ export default function PaymentEwalletPage() {
                 selected === v.id ? "border-brand-700 bg-brand-50/50" : "border-neutral-200 bg-white"
               }`}
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-100 text-[10px] font-bold text-neutral-600">
-                {v.name.slice(0, 3).toUpperCase()}
+              <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-xl bg-white">
+                <Image src={v.logo} alt={v.name} fill sizes="36px" className="object-contain p-1" />
               </span>
               <span className="flex-1">
                 <span className="block text-sm font-semibold text-neutral-900">{v.name}</span>
