@@ -296,7 +296,7 @@ function OrderCard({
   order,
   actionLabel,
   onAction,
-}: {
+}: {           
   order: KokiCard;
   actionLabel: string;
   onAction: () => void;

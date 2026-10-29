@@ -153,10 +153,12 @@ export default function BayarCashPage() {
               <span>PB1 / Pajak Restoran (10%)</span>
               <span>{formatRupiah(order.tax)}</span>
             </div>
-            <div className="flex justify-between">
-              <span>Biaya Layanan (5%)</span>
-              <span>{formatRupiah(order.serviceFee)}</span>
-            </div>
+            {order.serviceFee > 0 && (
+              <div className="flex justify-between">
+                <span>Biaya Layanan</span>
+                <span>{formatRupiah(order.serviceFee)}</span>
+              </div>
+            )}
           </div>
           <div className="mt-2 flex items-center justify-between border-t border-neutral-100 pt-2">
             <span className="text-base font-semibold text-neutral-900">Total Pembayaran</span>

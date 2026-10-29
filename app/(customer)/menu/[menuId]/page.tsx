@@ -93,8 +93,8 @@ export default function DetailMenuPage() {
   const hasDiscount = !!menu.originalPrice && menu.originalPrice > menu.price;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA] pb-44 text-[#1A1A18] font-sans">
-      <div className="max-w-md mx-auto relative bg-white min-h-screen shadow-sm">
+    <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A18] font-sans">
+      <div className="max-w-2xl mx-auto lg:max-w-5xl relative bg-white min-h-screen shadow-sm pb-12">
         <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between">
           <button
             type="button"
@@ -234,7 +234,7 @@ export default function DetailMenuPage() {
           </div>
         </div>
 
-        <div className="fixed bottom-14 left-0 right-0 p-4 z-30 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-stone-200 shadow-lg">
+        <div className="pt-4 pb-14 md:pb-20">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
@@ -286,7 +286,7 @@ export default function DetailMenuPage() {
           </div>
         </div>
 
-        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E4E4E7] px-6 py-2 flex items-center justify-between z-40 max-w-md mx-auto">
+        <nav className="fixed bottom-0 md:bottom-4 left-0 right-0 bg-white border-t border-[#E4E4E7] px-6 py-2 flex items-center justify-between z-40 max-w-md mx-auto">
           <Link
             href="/menu"
             className="flex flex-col items-center gap-1 text-[#054B35]"

@@ -22,8 +22,8 @@ export function BottomNav() {
     (href === "/menu" && (pathname === "/takeaway" || pathname?.startsWith("/takeaway/")));
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 mx-auto max-w-md">
-      <div className="relative bg-white/95 backdrop-blur-2xl border-t border-black/[0.04] px-2 pt-1.5 pb-2 flex items-center justify-around shadow-[0_-8px_32px_rgba(0,0,0,0.08)]">
+    <nav className="fixed bottom-0 md:bottom-4 left-0 right-0 z-40 mx-auto max-w-md md:max-w-xl lg:max-w-2xl px-0 md:px-4">
+      <div className="relative bg-white/95 backdrop-blur-2xl border-t md:border border-black/[0.08] px-2 md:px-6 pt-1.5 pb-2 md:py-2 flex items-center justify-around shadow-[0_-8px_32px_rgba(0,0,0,0.08)] md:shadow-2xl md:rounded-3xl">
         {NAV_ITEMS.map(({ href, label, icon: Icon, showBadge }) => {
           const active = isActive(href);
           return (

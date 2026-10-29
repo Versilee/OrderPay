@@ -20,7 +20,7 @@ const EWALLETS = [
 const VA_OPTIONS = [
   { id: "bca", name: "BCA mobile / myBCA", desc: "Virtual Account 014892188 · Cek Otomatis", logo: "/images/payment/logo_bca.png" },
   { id: "mandiri", name: "Mandiri Livin'", desc: "Koneksi Mandiri biller · Verifikasi instan", logo: "/images/payment/logo_mandiri.png"},
-  { id: "bri", name: "BRImo", desc: "BRIVA terhubung otomatis", logo: "/images/payment/logo_bri.png"},
+  { id: "bri", name: "BRImo", desc: "BRIVA terhubung otomatis", logo: "/images/payment/logo_bri_imo.png"},
   { id: "bni", name: "BNI Mobile Banking", desc: "Virtual Account 988892188", logo: "/images/payment/logo_bni.png"},
 ];
 

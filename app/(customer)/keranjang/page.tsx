@@ -299,10 +299,12 @@ export default function KeranjangPage() {
                 <span>PB1 / Pajak Restoran (10%)</span>
                 <span>{formatRupiah(totals.tax)}</span>
               </div>
-              <div className="flex justify-between py-1 text-sm text-neutral-600">
-                <span>Biaya Layanan (5%)</span>
-                <span>{formatRupiah(totals.serviceFee)}</span>
-              </div>
+              {totals.serviceFee > 0 && (
+                <div className="flex justify-between py-1 text-sm text-neutral-600">
+                  <span>Biaya Layanan</span>
+                  <span>{formatRupiah(totals.serviceFee)}</span>
+                </div>
+              )}
 
               <div className="mt-3 border-t border-neutral-100 pt-3">
                 <p className="text-xs font-medium text-neutral-500">TOTAL PEMBAYARAN</p>

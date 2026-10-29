@@ -370,10 +370,12 @@ export default function OrderHistoryDashboard() {
                       <span>PB1 Restoran (10%)</span>
                       <span>Rp {activeOrder.tax.toLocaleString("id-ID")}</span>
                     </div>
-                    <div className="flex justify-between text-slate-600 font-light">
-                      <span>Service (5%)</span>
-                      <span>Rp {activeOrder.serviceFee.toLocaleString("id-ID")}</span>
-                    </div>
+                    {activeOrder.serviceFee > 0 && (
+                      <div className="flex justify-between text-slate-600 font-light">
+                        <span>Service</span>
+                        <span>Rp {activeOrder.serviceFee.toLocaleString("id-ID")}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between text-slate-900 font-normal pt-2 border-t border-slate-200/60 text-sm">
                       <span>Total Pembayaran</span>
                       <span className="font-normal text-[#054B35]">
