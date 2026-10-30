@@ -94,7 +94,7 @@ export default function DetailMenuPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A18] font-sans">
-      <div className="max-w-2xl mx-auto lg:max-w-5xl relative bg-white min-h-screen shadow-sm pb-12">
+      <div className="max-w-2xl mx-auto lg:max-w-5xl relative bg-white min-h-screen shadow-sm pb-36">
         <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between">
           <button
             type="button"
