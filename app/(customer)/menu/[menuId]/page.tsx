@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -13,8 +12,6 @@ import {
   RefreshCw,
   UtensilsCrossed,
   ShoppingBag,
-  ReceiptText,
-  CookingPot,
   Clock,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -27,7 +24,7 @@ export default function DetailMenuPage() {
   const menuId = params?.menuId ? String(params.menuId) : "";
 
   const { item: menu, loading } = useMenuItem(menuId);
-  const { addItem, totalItemCount } = useCart();
+  const { addItem } = useCart();
   const { tableNumber, mode } = useSession();
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
@@ -94,7 +91,8 @@ export default function DetailMenuPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A18] font-sans">
-      <div className="max-w-2xl mx-auto lg:max-w-5xl relative bg-white min-h-screen shadow-sm pb-36">
+      <div className="max-w-2xl mx-auto lg:max-w-5xl relative bg-white min-h-screen shadow-sm pb-24">
+        {/* TOP BAR / HEADER */}
         <div className="absolute top-4 left-4 right-4 z-20 flex items-center justify-between">
           <button
             type="button"
@@ -123,6 +121,7 @@ export default function DetailMenuPage() {
           </div>
         </div>
 
+        {/* GAMBAR MENU */}
         <div className="relative w-full h-72 bg-stone-100">
           {menu.image ? (
             <Image
@@ -162,7 +161,9 @@ export default function DetailMenuPage() {
           </div>
         </div>
 
+        {/* CONTAINER UTAMA SEMUA KARTU */}
         <div className="p-4 space-y-4">
+          {/* KARTU 1: DETAIL INFORMASI MENU */}
           <div className="bg-white rounded-2xl p-4 border border-[#E4E4E7] shadow-sm space-y-2">
             {menu.tag && (
               <span className="inline-block text-[10px] font-normal uppercase tracking-wider bg-stone-100 text-stone-600 px-2.5 py-1 rounded-md">
@@ -189,6 +190,7 @@ export default function DetailMenuPage() {
             </p>
           </div>
 
+          {/* KARTU 2: CATATAN PESANAN / PREFERENSI SAJIAN */}
           <div className="bg-white rounded-2xl p-4 border border-[#E4E4E7] shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <div>
@@ -232,29 +234,29 @@ export default function DetailMenuPage() {
               className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-xs text-slate-900 placeholder-stone-400 focus:outline-none focus:border-[#054B35] focus:bg-white transition resize-none font-light"
             />
           </div>
-        </div>
 
-        <div className="pt-4 pb-14 md:pb-20">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
+          {/* KARTU 3: RINGKASAN & TOMBOL TAMBAH KE PESANAN (INLINE CARD) */}
+          <div className="bg-white rounded-2xl p-4 border border-[#E4E4E7] shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <div>
-                <p className="text-[10px] text-stone-500 uppercase tracking-wider font-normal">
+                <p className="text-[10px] text-stone-500 uppercase tracking-wider font-medium">
                   ESTIMASI TOTAL
                 </p>
-                <p className="text-lg font-normal text-[#09090B]">
+                <p className="text-lg font-bold text-[#09090B]">
                   Rp {estimatedTotal.toLocaleString("id-ID")}
                 </p>
               </div>
 
-              <div className="flex items-center border border-stone-300 rounded-full px-2 py-1 bg-white gap-3 shadow-sm">
+              {/* Kontrol Jumlah / Quantity */}
+              <div className="flex items-center border border-stone-200 rounded-full px-2 py-1 bg-stone-50 gap-3">
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-stone-700 hover:bg-stone-100 transition"
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-stone-700 hover:bg-stone-200 transition"
                 >
-                  <Minus className="w-4 h-4 stroke-[1.8]" />
+                  <Minus className="w-4 h-4 stroke-[2]" />
                 </button>
-                <span className="text-sm font-normal text-slate-900 min-w-[16px] text-center">
+                <span className="text-sm font-semibold text-slate-900 min-w-[16px] text-center">
                   {quantity}
                 </span>
                 <button
@@ -262,21 +264,24 @@ export default function DetailMenuPage() {
                   onClick={() => setQuantity(quantity + 1)}
                   className="w-7 h-7 rounded-full bg-[#054B35] text-white flex items-center justify-center hover:bg-emerald-900 transition"
                 >
-                  <Plus className="w-4 h-4 stroke-[1.8]" />
+                  <Plus className="w-4 h-4 stroke-[2]" />
                 </button>
               </div>
             </div>
 
+            {/* Tombol Tambah ke Pesanan */}
             <button
               type="button"
               onClick={handleAddToCart}
-              className="w-full bg-[#054B35] text-white font-normal py-3.5 px-4 rounded-xl hover:bg-emerald-900 transition shadow-md flex items-center justify-between text-sm"
+              className="w-full bg-[#054B35] text-white font-medium py-3.5 px-4 rounded-xl hover:bg-emerald-900 transition shadow-md flex items-center justify-between text-sm active:scale-[0.99]"
             >
               <div className="flex items-center gap-2">
-                <ShoppingBag className="w-4 h-4 stroke-[1.8]" />
+                <ShoppingBag className="w-4 h-4 stroke-[2]" />
                 <span>Tambah ke Pesanan</span>
               </div>
-              <span>Rp {estimatedTotal.toLocaleString("id-ID")}</span>
+              <span className="font-semibold">
+                Rp {estimatedTotal.toLocaleString("id-ID")}
+              </span>
             </button>
 
             <div className="flex items-center justify-center gap-1.5 text-[10px] text-stone-500 font-light pt-0.5">
@@ -285,42 +290,6 @@ export default function DetailMenuPage() {
             </div>
           </div>
         </div>
-
-        <nav className="fixed bottom-0 md:bottom-4 left-0 right-0 bg-white border-t border-[#E4E4E7] px-6 py-2 flex items-center justify-between z-40 max-w-md mx-auto">
-          <Link
-            href="/menu"
-            className="flex flex-col items-center gap-1 text-[#054B35]"
-          >
-            <UtensilsCrossed className="w-5 h-5 stroke-[1.8]" />
-            <span className="text-[11px] font-normal">Menu</span>
-          </Link>
-          <Link
-            href="/keranjang"
-            className="flex flex-col items-center gap-1 text-[#9CA3AF] hover:text-slate-800 relative"
-          >
-            <ShoppingBag className="w-5 h-5 stroke-[1.8]" />
-            {totalItemCount > 0 && (
-              <span className="absolute -top-1 right-2 bg-amber-400 text-slate-950 font-normal text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center">
-                {totalItemCount}
-              </span>
-            )}
-            <span className="text-[11px] font-normal">Keranjang</span>
-          </Link>
-          <Link
-            href="/payment"
-            className="flex flex-col items-center gap-1 text-[#9CA3AF] hover:text-slate-800"
-          >
-            <ReceiptText className="w-5 h-5 stroke-[1.8]" />
-            <span className="text-[11px] font-normal">Pembayaran</span>
-          </Link>
-          <Link
-            href="/status"
-            className="flex flex-col items-center gap-1 text-[#9CA3AF] hover:text-slate-800"
-          >
-            <CookingPot className="w-5 h-5 stroke-[1.8]" />
-            <span className="text-[11px] font-normal">Status</span>
-          </Link>
-        </nav>
       </div>
     </div>
   );
