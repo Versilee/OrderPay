@@ -17,6 +17,8 @@ interface MenuRow {
   review_count: number;
   prep_time: string | null;
   is_popular: boolean;
+  options_title: string | null;
+  options: string[] | null;
 }
 
 function mapMenu(row: MenuRow): MenuItem {
@@ -33,6 +35,8 @@ function mapMenu(row: MenuRow): MenuItem {
     reviewCount: row.review_count,
     prepTime: row.prep_time ?? undefined,
     isPopular: row.is_popular,
+    optionsTitle: row.options_title ?? undefined,
+    options: row.options ?? undefined,
   };
 }
 

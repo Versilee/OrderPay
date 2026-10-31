@@ -33,14 +33,9 @@ export default function DetailMenuPage() {
 
   const placeLabel = mode === "dine-in" ? `Meja ${tableNumber}` : "Takeaway";
 
-  const noteOptions = [
-    "+ Pedas Sedang",
-    "+ Tidak Pedas",
-    "+ Pedas Banget",
-    "+ Telur Setengah Matang",
-    "+ Tanpa Daun Bawang",
-    "+ Kerupuk Dipisah",
-  ];
+  const hasOptions = menu?.options && Array.isArray(menu.options) && menu.options.length > 0;
+  const noteOptions = menu?.options ?? [];
+  const optionsTitle = menu?.optionsTitle || "Prefensi Sajian";
 
   if (loading) {
     return (
@@ -195,10 +190,12 @@ export default function DetailMenuPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-normal text-[#09090B]">
-                  Catatan Pesanan / Preferensi Sajian
+                  {hasOptions ? optionsTitle : "Catatan Pesanan"}
                 </h2>
                 <p className="text-[11px] text-stone-500 font-light mt-0.5">
-                  Tuliskan tingkat kepedasan, pilihan telur, atau catatan khusus
+                  {hasOptions
+                    ? "Pilih opsi prefensi penyajian "
+                    : "Tambahkan catatan khusus untuk pesanan ini"}
                 </p>
               </div>
               <span className="text-[10px] bg-stone-100 text-stone-500 px-2 py-0.5 rounded font-light">
@@ -206,6 +203,7 @@ export default function DetailMenuPage() {
               </span>
             </div>
 
+            {hasOptions && (
             <div className="flex flex-wrap gap-2 pt-1">
               {noteOptions.map((option) => {
                 const isSelected = selectedNotes.includes(option);
@@ -223,14 +221,19 @@ export default function DetailMenuPage() {
                     {option}
                   </button>
                 );
-              })}
+            })}
             </div>
+            )}
 
             <textarea
               rows={2}
               value={customNote}
               onChange={(e) => setCustomNote(e.target.value)}
-              placeholder="Contoh: Pedas sedang, telur mata sapi setengah matang, kerupuk dipisah..."
+              placeholder={
+                hasOptions
+                  ? "Catatan tambahan (Contoh: Alergi kacang)"
+                  : "Tulis catatan khusus (opsional)..."
+              }
               className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-xs text-slate-900 placeholder-stone-400 focus:outline-none focus:border-[#054B35] focus:bg-white transition resize-none font-light"
             />
           </div>

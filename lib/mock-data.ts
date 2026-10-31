@@ -2,7 +2,7 @@ import { MenuItem } from "./types";
 
 export const MENU_ITEMS: MenuItem[] = [
   {
-    id: "ngk01",
+    id: "MC-001",
     name: "Nasi Goreng Kampung Spesial",
     description:
       "Nasi goreng racikan bumbu terasi khas Nusantara yang harum gurih, disajikan dengan telur mata sapi setengah matang, 2 tusuk sate ayam empuk bumbu kacang, kerupuk udang renyah, acar segar, dan taburan bawang goreng renyah.",
@@ -16,9 +16,11 @@ export const MENU_ITEMS: MenuItem[] = [
     reviewCount: 120,
     prepTime: "~15 mnt",
     isPopular: true,
+    optionsTitle: "Tingkat kepedasan",
+    options: ["Tidak Pedas", "Pedas Sedang", "Pedas Banget"],
   },
   {
-    id: "abmt02",
+    id: "MC-002",
     name: "Ayam Bakar Madu Taliwang",
     description:
       "Ayam pejantan dipanggang arang berbalut glaze madu pedas aromatik, disajikan dengan lalapan segar dan sambal khas.",
@@ -33,7 +35,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isPopular: true,
   },
   {
-    id: "sbks03",
+    id: "MC-003",
     name: "Soto Betawi Kuah Santan",
     description:
       "Kuah santan susu gurih rempah, potongan daging sapi empuk, tomat, dan emping renyah khas Jakarta.",
@@ -48,7 +50,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isPopular: true,
   },
   {
-    id: "ejkm04",
+    id: "BV-001",
     name: "Es Jeruk Kelapa Muda",
     description:
       "Perasan jeruk peras asli berpadu lembutnya serutan kelapa muda dan es batu segar.",
@@ -63,7 +65,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isPopular: true,
   },
   {
-    id: "tcgc05",
+    id: "SN-001",
     name: "Tahu Cabe Garam Crispy",
     description:
       "Tahu sutra dipotong dadu digoreng garing keemasan, ditaburi tumisan cabai dan bawang garing.",
@@ -78,7 +80,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isPopular: true,
   },
   {
-    id: "eksg06",
+    id: "BV-002",
     name: "Es Kopi Susu Gula Aren",
     description:
       "Ekstraksi kopi robusta blend nusantara, susu segar creamy dan gula aren asli.",
@@ -93,7 +95,7 @@ export const MENU_ITEMS: MenuItem[] = [
     isPopular: true,
   },
   {
-    id: "ttbp04",
+    id: "MC-004",
     name: "Tahu Telur Bumbu Petis",
     description:
       "Tahu telur goreng renyah disiram bumbu petis kacang gurih manis, taburan kerupuk dan bawang goreng.",
@@ -107,7 +109,7 @@ export const MENU_ITEMS: MenuItem[] = [
     prepTime: "~12 mnt",
   },
   {
-    id: "etmj07",
+    id: "BV-003",
     name: "Es Teh Manis Jumbo",
     description: "Seduhan teh pilihan disajikan dingin dengan gula secukupnya, porsi jumbo.",
     price: 8000,

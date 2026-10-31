@@ -28,6 +28,8 @@ export interface MenuItem {
   reviewCount?: number;
   prepTime?: string;
   isPopular?: boolean;
+  optionsTitle?: string;
+  options?: string[];
 }
 
 export interface CartItem {
