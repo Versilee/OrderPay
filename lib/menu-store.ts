@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getSupabase } from "@/lib/supabase/client";
 import type { MenuItem } from "@/lib/types";
+import { MENU_ITEMS } from "@/lib/mock-data";
 
 interface MenuRow {
   id: string;
@@ -18,10 +19,27 @@ interface MenuRow {
   prep_time: string | null;
   is_popular: boolean;
   options_title: string | null;
-  options: string[] | null;
+  options: string[] | string | null;
 }
 
 function mapMenu(row: MenuRow): MenuItem {
+  let parseOptions: string[] | undefined = undefined;
+
+  if (Array.isArray(row.options)) {
+    parseOptions = row.options;
+  } else if (typeof row.options === "string") {
+    try {
+      const parsed = JSON.parse(row.options);
+      if (Array.isArray(parsed)) {
+        parseOptions = parsed;
+      }
+    } catch {
+      parseOptions = undefined;
+    }
+  }
+
+  const mockItem = MENU_ITEMS.find((item) => item.id === row.id);
+
   return {
     id: row.id,
     name: row.name,
@@ -35,8 +53,8 @@ function mapMenu(row: MenuRow): MenuItem {
     reviewCount: row.review_count,
     prepTime: row.prep_time ?? undefined,
     isPopular: row.is_popular,
-    optionsTitle: row.options_title ?? undefined,
-    options: row.options ?? undefined,
+    optionsTitle: row.options_title ?? mockItem?.optionsTitle ?? undefined,
+    options: parseOptions ?? mockItem?.options ?? undefined,
   };
 }
 
