@@ -150,39 +150,39 @@ export function MenuPageContent({ initialMode }: MenuPageContentProps) {
       style={{ fontFamily: "'Manrope', sans-serif" }}
     >
       {/* HEADER */}
-      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur-xl border-b border-[#E4E4E7]">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-3.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* LOGO BARU DARI PUBLIC */}
-            <div className="relative w-10 h-10 rounded-2xl overflow-hidden flex items-center justify-center shadow-sm border border-[#E4E4E7] bg-white">
-              <Image
-                src="/images/menu/logo_orderpay1.png"
-                alt="Logo OrderPay"
-                fill
-                sizes="40px"
-                className="object-contain p-1"
-              />
-            </div>
+<header className="sticky top-0 z-20 bg-white/90 backdrop-blur-xl border-b border-[#E4E4E7]">
+  <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-3 flex items-center justify-between">
+    <div className="flex items-center gap-3.5">
+      <div className="relative w-14 h-14 flex-shrink-0">
+        <Image
+          src="/images/menu/logo_orderpay1.png"
+          alt="Logo OrderPay"
+          fill
+          sizes="56px"
+          className="object-contain"
+          priority
+        />
+      </div>
 
-            <div>
-              <p className="text-[10px] text-[#71717A] tracking-widest uppercase font-medium">
-                Resto Suka Maju
-              </p>
+      <div>
+        <p className="text-[10px] text-[#71717A] tracking-widest uppercase font-medium">
+          Resto Suka Maju
+        </p>
 
-              <h1 className="text-base font-bold text-[#09090B] leading-tight">
-                {currentMode === "takeaway"
-                  ? "Menu Takeaway"
-                  : "Menu Makanan"}
-              </h1>
-            </div>
-          </div>
+        <h1 className="text-base font-bold text-[#09090B] leading-tight">
+          {currentMode === "takeaway"
+            ? "Menu Takeaway"
+            : "Menu Makanan"}
+        </h1>
+      </div>
+    </div>
 
-          <div className="bg-emerald-50 text-[#054B35] text-xs px-3.5 py-1.5 rounded-full flex items-center gap-2 border border-emerald-200/60 font-semibold shadow-sm">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            {currentMode === "dine-in" ? `Meja ${tableNumber}` : "Takeaway"}
-          </div>
-        </div>
-      </header>
+    <div className="bg-emerald-50 text-[#054B35] text-xs px-3.5 py-1.5 rounded-full flex items-center gap-2 border border-emerald-200/60 font-semibold shadow-sm">
+      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      {currentMode === "dine-in" ? `Meja ${tableNumber}` : "Takeaway"}
+    </div>
+  </div>
+</header>
 
       <div className="p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto">
 
