@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
-  Heart,
   Star,
   Plus,
   Minus,
@@ -27,15 +26,9 @@ export default function DetailMenuPage() {
   const { addItem } = useCart();
   const { tableNumber, mode } = useSession();
   const [quantity, setQuantity] = useState<number>(1);
-  const [selectedNotes, setSelectedNotes] = useState<string[]>([]);
   const [customNote, setCustomNote] = useState<string>("");
-  const [isLiked, setIsLiked] = useState<boolean>(false);
 
   const placeLabel = mode === "dine-in" ? `Meja ${tableNumber}` : "Takeaway";
-
-  const hasOptions = menu?.options && Array.isArray(menu.options) && menu.options.length > 0;
-  const noteOptions = menu?.options ?? [];
-  const optionsTitle = menu?.optionsTitle || "Prefensi Sajian";
 
   if (loading) {
     return (
@@ -67,17 +60,8 @@ export default function DetailMenuPage() {
     );
   }
 
-  const toggleNote = (option: string) => {
-    if (selectedNotes.includes(option)) {
-      setSelectedNotes(selectedNotes.filter((item) => item !== option));
-    } else {
-      setSelectedNotes([...selectedNotes, option]);
-    }
-  };
-
   const handleAddToCart = () => {
-    const combinedNotes = [...selectedNotes, customNote].filter(Boolean).join(", ");
-    addItem(menu, quantity, combinedNotes);
+    addItem(menu, quantity, customNote);
     router.push("/menu");
   };
 
@@ -102,17 +86,6 @@ export default function DetailMenuPage() {
               <span className="w-2 h-2 rounded-full bg-[#054B35]"></span>
               {placeLabel}
             </span>
-            <button
-              type="button"
-              onClick={() => setIsLiked(!isLiked)}
-              className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center border border-stone-200/60 shadow-sm text-slate-800 hover:bg-white transition"
-            >
-              <Heart
-                className={`w-5 h-5 stroke-[1.8] ${
-                  isLiked ? "fill-red-500 text-red-500" : "text-slate-700"
-                }`}
-              />
-            </button>
           </div>
         </div>
 
@@ -185,17 +158,15 @@ export default function DetailMenuPage() {
             </p>
           </div>
 
-          {/* KARTU 2: CATATAN PESANAN / PREFERENSI SAJIAN */}
+          {/* KARTU 2: PREFERENSI SAJIAN / CATATAN PESANAN */}
           <div className="bg-white rounded-2xl p-4 border border-[#E4E4E7] shadow-sm space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-normal text-[#09090B]">
-                  {hasOptions ? optionsTitle : "Catatan Pesanan"}
+                  Preferensi Sajian
                 </h2>
                 <p className="text-[11px] text-stone-500 font-light mt-0.5">
-                  {hasOptions
-                    ? "Pilih opsi prefensi penyajian "
-                    : "Tambahkan catatan khusus untuk pesanan ini"}
+                  Tambahkan catatan khusus untuk penyajian pesanan ini
                 </p>
               </div>
               <span className="text-[10px] bg-stone-100 text-stone-500 px-2 py-0.5 rounded font-light">
@@ -203,42 +174,16 @@ export default function DetailMenuPage() {
               </span>
             </div>
 
-            {hasOptions && (
-            <div className="flex flex-wrap gap-2 pt-1">
-              {noteOptions.map((option) => {
-                const isSelected = selectedNotes.includes(option);
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => toggleNote(option)}
-                    className={`text-xs px-3 py-1.5 rounded-full border transition font-normal ${
-                      isSelected
-                        ? "bg-[#054B35] text-white border-[#054B35]"
-                        : "bg-stone-50 text-stone-700 border-stone-200 hover:bg-stone-100"
-                    }`}
-                  >
-                    {option}
-                  </button>
-                );
-            })}
-            </div>
-            )}
-
             <textarea
               rows={2}
               value={customNote}
               onChange={(e) => setCustomNote(e.target.value)}
-              placeholder={
-                hasOptions
-                  ? "Catatan tambahan (Contoh: Alergi kacang)"
-                  : "Tulis catatan khusus (opsional)..."
-              }
-              className="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-xs text-slate-900 placeholder-stone-400 focus:outline-none focus:border-[#054B35] focus:bg-white transition resize-none font-light"
+              placeholder="Tulis catatan khusus (Contoh: Tanpa bawang, pedas sedang, es dikurangi, dll)..."
+              className="w-full bg-stone-50 border border-[#E4E4E7] rounded-xl p-3 text-xs text-slate-900 placeholder-stone-400 focus:outline-none focus:border-[#054B35] focus:bg-white transition resize-none font-light"
             />
           </div>
 
-          {/* KARTU 3: RINGKASAN & TOMBOL TAMBAH KE PESANAN (INLINE CARD) */}
+          {/* KARTU 3: RINGKASAN & TOMBOL TAMBAH KE PESANAN */}
           <div className="bg-white rounded-2xl p-4 border border-[#E4E4E7] shadow-sm space-y-4">
             <div className="flex items-center justify-between border-b border-stone-100 pb-3">
               <div>
@@ -276,7 +221,7 @@ export default function DetailMenuPage() {
             <button
               type="button"
               onClick={handleAddToCart}
-              className="w-full bg-[#054B35] text-white font-medium py-3.5 px-4 rounded-xl hover:bg-emerald-900 transition shadow-md flex items-center justify-between text-sm active:scale-[0.99]"
+              className="w-full bg-[#054B35] text-[#FFFFFF] font-medium py-3.5 px-4 rounded-xl hover:bg-emerald-900 transition shadow-md flex items-center justify-between text-sm active:scale-[0.99]"
             >
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-4 h-4 stroke-[2]" />

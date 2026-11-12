@@ -16,8 +16,6 @@ export const MENU_ITEMS: MenuItem[] = [
     reviewCount: 120,
     prepTime: "~15 mnt",
     isPopular: true,
-    optionsTitle: "Tingkat kepedasan",
-    options: ["Tidak Pedas", "Pedas Sedang", "Pedas Banget"],
   },
   {
     id: "MC-002",
