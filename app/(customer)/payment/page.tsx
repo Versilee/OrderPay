@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Script from "next/script";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ShieldCheck, ExternalLink, ChevronRight, XCircle } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useSession } from "@/context/SessionContext";
-import { useOrder, markPaid } from "@/lib/order-store";
+import { useOrder} from "@/lib/order-store";
 import { formatRupiah } from "@/lib/utils";
 import { RESTAURANT_NAME } from "@/lib/constants";
 import Image from "next/image";
@@ -23,6 +24,22 @@ const VA_OPTIONS = [
   { id: "bri", name: "BRImo", desc: "BRIVA terhubung otomatis", logo: "/images/payment/logo_bri_imo.png"},
   { id: "bni", name: "BNI Mobile Banking", desc: "Virtual Account 988892188", logo: "/images/payment/logo_bni.png"},
 ];
+
+declare global {
+  interface Window {
+    snap?: {
+      pay: (
+        token: string,
+        options?: {
+          onSuccess?: (result: unknown) => void;
+          onPending?: (result: unknown) => void;
+          onError?: (result: unknown) => void;
+          onClose?: () => void;
+        }
+      ) => void;
+    };
+  }
+}
 
 export default function PaymentEwalletPage() {
   const router = useRouter();
@@ -42,21 +59,71 @@ export default function PaymentEwalletPage() {
   const selectedWallet = EWALLETS.find((w) => w.id === selected);
 
   async function handlePay() {
-    if (!order || paying) return;
-    setPaying(true);
-    setPayError("");
+  if (!order || paying) return;
 
-    const err = await markPaid(order.id, "ewallet");
-    if (err) {
-      setPayError(err);
-      setPaying(false);
-      return;
+  if (!window.snap) {
+    setPayError("Midtrans belum siap. Silakan coba lagi.");
+    return;
+  }
+
+  setPaying(true);
+  setPayError("");
+
+  try {
+    const response = await fetch("/api/midtrans/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        orderId: order.id,
+        customerName: "Customer OrderPay",
+        customerEmail: "customer@orderpay.local",
+      }),
+    });
+
+    const result = (await response.json()) as {
+      ok?: boolean;
+      token?: string;
+      error?: string;
+    };
+
+    if (!response.ok || !result.ok || !result.token) {
+      throw new Error(result.error ?? "Gagal membuat transaksi Midtrans.");
     }
 
-    setOrderedItems(items);
-    clearCart();
-    router.push("/konfirmasi/online");
+    window.snap.pay(result.token, {
+      onSuccess: () => {
+
+        setOrderedItems(items);
+        clearCart();
+        router.push("/status");
+      },
+
+      onPending: () => {
+        setOrderedItems(items);
+        clearCart();
+        router.push("/status");
+      },
+
+      onError: () => {
+        setPayError("Pembayaran gagal. Silakan coba lagi.");
+        setPaying(false);
+      },
+
+      onClose: () => {
+        setPaying(false);
+      },
+    });
+  } catch (error) {
+    setPayError(
+      error instanceof Error
+        ? error.message
+        : "Gagal memproses pembayaran."
+    );
+    setPaying(false);
   }
+}
 
   const header = (
     <header className="flex items-center justify-between px-5 py-3 bg-white border-b border-black/5">
@@ -101,6 +168,21 @@ export default function PaymentEwalletPage() {
 
   return (
     <div>
+          <Script
+      src={
+        process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
+          ? "https://app.sandbox.midtrans.com/snap/snap.js"
+          : ""
+      }
+      data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+      strategy="afterInteractive"
+      onLoad={() => {
+        console.info("Midtrans Snap.js berhasil dimuat.");
+      }}
+      onError={() => {
+        setPayError("Gagal memuat Midtrans Snap.js.");
+      }}
+    />
       {header}
 
       <div className="px-5 pt-4 pb-8">
