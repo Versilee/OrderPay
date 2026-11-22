@@ -4,8 +4,8 @@ import midtransClient from "midtrans-client";
 const serverKey = process.env.MIDTRANS_SERVER_KEY;
 const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY;
 
-if (!serverKey) throw new Error("MIDTRANS_SERVER_KEY belum diatur.");
-if (!clientKey) throw new Error("NEXT_PUBLIC_MIDTRANS_CLIENT_KEY belum diatur.");
+if (!serverKey) throw new Error("SB-Mid-server-c1~iFF0syrZV_8OrsEzUj4Y6");
+if (!clientKey) throw new Error("Mid-client-cSRZt_9XRo_JFy37");
 
 export const snap = new midtransClient.Snap({
   isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",

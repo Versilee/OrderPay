@@ -18,7 +18,9 @@ export async function POST(request: Request) {
     const supabase = getSupabaseAdmin();
     const { data: order, error } = await supabase
       .from("orders")
-      .select("id,total,payment_status,order_items(id,name,price,quantity)")
+      .select(
+        `id, total, service_fee, tax, discount, payment_status, order_items(id, name, price, quantity)`
+      )
       .eq("id", orderId)
       .maybeSingle();
 
@@ -28,11 +30,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Pesanan sudah dibayar." }, { status: 409 });
     }
 
-    const grossAmount = Math.round(Number(order.total));
-    if (!Number.isFinite(grossAmount) || grossAmount <= 0) {
-      return NextResponse.json({ error: "Total pesanan tidak valid." }, { status: 400 });
-    }
-
     const itemDetails = (order.order_items ?? []).map((item) => ({
       id: String(item.id),
       name: String(item.name).slice(0, 50),
@@ -40,11 +37,37 @@ export async function POST(request: Request) {
       quantity: Number(item.quantity),
     }));
 
+    let grossAmount = itemDetails.reduce(
+      (sum, it) => sum + it.price * it.quantity,
+      0
+    );
+
+    if (order.service_fee && Number(order.service_fee) > 0) {
+      itemDetails.push({
+        id: "sf_" + Date.now(),
+        name: "Biaya Layanan",
+        price: Math.round(Number(order.service_fee)),
+        quantity: 1,
+      });
+      grossAmount += Math.round(Number(order.service_fee));
+    }
+
+    if (order.tax && Number(order.tax) > 0) {
+      itemDetails.push({
+        id: "tax_" + Date.now(),
+        name: "Pajak",
+        price: Math.round(Number(order.tax)),
+        quantity: 1,
+      });
+      grossAmount += Math.round(Number(order.tax));
+    }
+
     const transaction = await snap.createTransaction({
       transaction_details: { order_id: order.id, gross_amount: grossAmount },
       item_details: itemDetails,
       customer_details: {
-        first_name: typeof body?.customerName === "string" ? body.customerName : "Customer OrderPay",
+        first_name:
+          typeof body?.customerName === "string" ? body.customerName : "Customer OrderPay",
         email: typeof body?.customerEmail === "string" ? body.customerEmail : "customer@orderpay.local",
       },
       expiry: { unit: "minutes", duration: 60 },
