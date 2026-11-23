@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -11,6 +12,7 @@ import {
   ConciergeBell,
   Banknote,
   Wallet,
+  RefreshCw,
 } from "lucide-react";
 import { useSession } from "@/context/SessionContext";
 import { useOrder, formatTime } from "@/lib/order-store";
@@ -38,6 +40,43 @@ export default function StatusPesananPage() {
   const router = useRouter();
   const { tableNumber, mode, orderId } = useSession();
   const order = useOrder(orderId);
+  const [syncing, setSyncing] = useState(false);
+
+  // Auto-sync status dari Midtrans jika status masih unpaid & ewallet
+  useEffect(() => {
+    if (!order || order.paymentStatus === "paid" || order.paymentMethod === "cash") return;
+
+    let isSubscribed = true;
+
+    async function syncPayment() {
+      if (!orderId) return;
+      try {
+        setSyncing(true);
+        await fetch("/api/midtrans/sync", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId }),
+        });
+      } catch (err) {
+        console.error("Auto-sync error:", err);
+      } finally {
+        if (isSubscribed) setSyncing(false);
+      }
+    }
+
+    // Jalankan sync pertama saat buka halaman
+    void syncPayment();
+
+    // Polling setiap 4 detik selama status belum paid
+    const interval = setInterval(() => {
+      void syncPayment();
+    }, 4000);
+
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
+  }, [order, orderId]);
 
   const header = (
     <header className="flex items-center justify-between px-5 py-3 bg-white border-b border-black/5">
@@ -108,10 +147,10 @@ export default function StatusPesananPage() {
               <p className="text-base font-semibold text-neutral-900">{formatRupiah(order.total)}</p>
             </div>
 
-            {isCash && (
-              <div className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-emerald-200/60 bg-emerald-50 px-4 py-2.5 text-xs font-medium text-[#054B35]">
-                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                Menunggu konfirmasi kasir
+            {!isCash && (
+              <div className="mt-3 flex items-center justify-center gap-2 rounded-xl border border-amber-200/60 bg-amber-50 px-4 py-2.5 text-xs font-medium text-amber-800">
+                <RefreshCw size={13} className={syncing ? "animate-spin" : ""} />
+                Memeriksa status pembayaran ke Midtrans...
               </div>
             )}
           </div>

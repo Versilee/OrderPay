@@ -62,6 +62,9 @@ export async function POST(request: Request) {
       grossAmount += Math.round(Number(order.tax));
     }
 
+    // Tentukan origin URL aplikasi
+    const origin = request.headers.get("origin") || "http://localhost:3000";
+
     const transaction = await snap.createTransaction({
       transaction_details: { order_id: order.id, gross_amount: grossAmount },
       item_details: itemDetails,
@@ -69,6 +72,9 @@ export async function POST(request: Request) {
         first_name:
           typeof body?.customerName === "string" ? body.customerName : "Customer OrderPay",
         email: typeof body?.customerEmail === "string" ? body.customerEmail : "customer@orderpay.local",
+      },
+      callbacks: {
+        finish: `${origin}/status`,
       },
       expiry: { unit: "minutes", duration: 60 },
     });

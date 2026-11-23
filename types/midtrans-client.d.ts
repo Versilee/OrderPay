@@ -20,6 +20,9 @@ declare module "midtrans-client" {
       first_name?: string;
       email?: string;
     };
+    callbacks?: {
+      finish?: string;
+    };
     expiry?: {
       unit: string;
       duration: number;
@@ -34,6 +37,9 @@ declare module "midtrans-client" {
   export class Snap {
     constructor(options: SnapOptions);
     createTransaction(parameter: TransactionParameter): Promise<TransactionResponse>;
+    transaction: {
+      notification(orderId: string): Promise<Record<string, unknown>>;
+    };
   }
 
   const midtransClient: { Snap: typeof Snap };

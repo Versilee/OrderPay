@@ -48,15 +48,33 @@ interface SessionContextValue {
 }
 
 const STORAGE_KEY = "orderpay_orders";
+const ORDER_ID_KEY = "orderpay_active_order_id";
 
 const SessionContext = createContext<SessionContextValue | undefined>(undefined);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<OrderMode>("dine-in");
-  const [orderId, setOrderId] = useState<string>("");
+
+  const [orderId, setOrderIdState] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem(ORDER_ID_KEY) || "";
+    }
+    return "";
+  });
+
+  const setOrderId = useCallback((id: string) => {
+    setOrderIdState(id);
+    if (typeof window !== "undefined") {
+      if (id) {
+        sessionStorage.setItem(ORDER_ID_KEY, id);
+      } else {
+        sessionStorage.removeItem(ORDER_ID_KEY);
+      }
+    }
+  }, []);
+
   const [orderedItems, setOrderedItemsState] = useState<CartItem[]>([]);
 
-  // Live orders shared across customer, kasir, koki, and admin
   const [orders, setOrdersState] = useState<OrderRecord[]>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -83,7 +101,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  // Sync across tabs
   useEffect(() => {
     function handleStorage(e: StorageEvent) {
       if (e.key === STORAGE_KEY && e.newValue) {
@@ -175,7 +192,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       addOrder(newOrder);
       return newOrder;
     },
-    [orderId, mode, addOrder]
+    [orderId, mode, addOrder, setOrderId]
   );
 
   const setOrderedItems = useCallback(
@@ -197,7 +214,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         return Array.from(map.values());
       });
 
-      // Also ensure order is registered into live orders if not empty
       if (newItems.length > 0) {
         createOrderFromCart(newItems);
       }

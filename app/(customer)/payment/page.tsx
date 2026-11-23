@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ShieldCheck, ExternalLink, ChevronRight, XCircle } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useSession } from "@/context/SessionContext";
-import { useOrder} from "@/lib/order-store";
+import { useOrder } from "@/lib/order-store";
 import { formatRupiah } from "@/lib/utils";
 import { RESTAURANT_NAME } from "@/lib/constants";
 import Image from "next/image";
@@ -59,71 +59,64 @@ export default function PaymentEwalletPage() {
   const selectedWallet = EWALLETS.find((w) => w.id === selected);
 
   async function handlePay() {
-  if (!order || paying) return;
+    if (!order || paying) return;
 
-  if (!window.snap) {
-    setPayError("Midtrans belum siap. Silakan coba lagi.");
-    return;
-  }
-
-  setPaying(true);
-  setPayError("");
-
-  try {
-    const response = await fetch("/api/midtrans/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        orderId: order.id,
-        customerName: "Customer OrderPay",
-        customerEmail: "customer@orderpay.local",
-      }),
-    });
-
-    const result = (await response.json()) as {
-      ok?: boolean;
-      token?: string;
-      error?: string;
-    };
-
-    if (!response.ok || !result.ok || !result.token) {
-      throw new Error(result.error ?? "Gagal membuat transaksi Midtrans.");
+    if (!window.snap) {
+      setPayError("Midtrans Snap belum siap. Silakan coba beberapa detik lagi.");
+      return;
     }
 
-    window.snap.pay(result.token, {
-      onSuccess: () => {
+    setPaying(true);
+    setPayError("");
 
-        setOrderedItems(items);
-        clearCart();
-        router.push("/status");
-      },
+    try {
+      const response = await fetch("/api/midtrans/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId: order.id,
+          customerName: "Customer OrderPay",
+          customerEmail: "customer@orderpay.local",
+        }),
+      });
 
-      onPending: () => {
-        setOrderedItems(items);
-        clearCart();
-        router.push("/status");
-      },
+      const result = (await response.json()) as {
+        ok?: boolean;
+        token?: string;
+        error?: string;
+      };
 
-      onError: () => {
-        setPayError("Pembayaran gagal. Silakan coba lagi.");
-        setPaying(false);
-      },
+      if (!response.ok || !result.ok || !result.token) {
+        throw new Error(result.error ?? "Gagal membuat transaksi Midtrans.");
+      }
 
-      onClose: () => {
-        setPaying(false);
-      },
-    });
-  } catch (error) {
-    setPayError(
-      error instanceof Error
-        ? error.message
-        : "Gagal memproses pembayaran."
-    );
-    setPaying(false);
+      window.snap.pay(result.token, {
+        onSuccess: () => {
+          setOrderedItems(items);
+          clearCart();
+          router.replace("/status");
+        },
+        onPending: () => {
+          setOrderedItems(items);
+          clearCart();
+          router.replace("/status");
+        },
+        onError: (err) => {
+          console.error("Snap Error:", err);
+          setPayError("Pembayaran tidak berhasil atau dibatalkan. Silakan coba lagi.");
+          setPaying(false);
+        },
+        onClose: () => {
+          setPaying(false);
+        },
+      });
+    } catch (error) {
+      setPayError(
+        error instanceof Error ? error.message : "Gagal memproses transaksi Midtrans."
+      );
+      setPaying(false);
+    }
   }
-}
 
   const header = (
     <header className="flex items-center justify-between px-5 py-3 bg-white border-b border-black/5">
@@ -168,21 +161,12 @@ export default function PaymentEwalletPage() {
 
   return (
     <div>
-          <Script
-      src={
-        process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY
-          ? "https://app.sandbox.midtrans.com/snap/snap.js"
-          : ""
-      }
-      data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
-      strategy="afterInteractive"
-      onLoad={() => {
-        console.info("Midtrans Snap.js berhasil dimuat.");
-      }}
-      onError={() => {
-        setPayError("Gagal memuat Midtrans Snap.js.");
-      }}
-    />
+      <Script
+        src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+        strategy="afterInteractive"
+      />
+
       {header}
 
       <div className="px-5 pt-4 pb-8">
@@ -196,7 +180,7 @@ export default function PaymentEwalletPage() {
           <p className="mt-1 text-2xl font-semibold text-neutral-900">{formatRupiah(order.total)}</p>
           <div className="mt-2 flex items-center gap-1.5 text-[11px] text-neutral-500">
             <ShieldCheck size={13} className="text-brand-600" />
-            Transaksi Aman Terenkripsi QRIS 128-bit
+            Transaksi Aman Terenkripsi Midtrans QRIS / Snap
             <span className="ml-auto rounded-md bg-neutral-100 px-1.5 py-0.5 text-neutral-500">Instan</span>
           </div>
         </div>
@@ -284,7 +268,7 @@ export default function PaymentEwalletPage() {
         </button>
 
         <p className="mt-6 text-center text-[11px] text-neutral-400">
-          Terhubung dengan Gateway QRIS &amp; Bank Indonesia
+          Terhubung dengan Gateway Midtrans Sandbox
           <br />
           <span className="text-neutral-500 underline">Butuh bantuan kasir? Panggil Pelayan ke Meja {tableNumber}</span>
         </p>
