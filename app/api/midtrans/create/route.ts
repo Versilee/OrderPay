@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const { data: order, error } = await supabase
       .from("orders")
       .select(
-        `id, total, service_fee, tax, discount, payment_status, order_items(id, name, price, quantity)`
+        `id, total, service_fee, tax, discount, promo_code, payment_status, order_items(id, name, price, quantity)`
       )
       .eq("id", orderId)
       .maybeSingle();
@@ -62,11 +62,11 @@ export async function POST(request: Request) {
       grossAmount += Math.round(Number(order.tax));
     }
 
-    // Tentukan origin URL aplikasi
     const origin = request.headers.get("origin") || "http://localhost:3000";
+    const midtransOrderId = `${order.id}-T${Date.now().toString().slice(-6)}`;
 
     const transaction = await snap.createTransaction({
-      transaction_details: { order_id: order.id, gross_amount: grossAmount },
+      transaction_details: { order_id: midtransOrderId, gross_amount: grossAmount },
       item_details: itemDetails,
       customer_details: {
         first_name:
@@ -79,7 +79,23 @@ export async function POST(request: Request) {
       expiry: { unit: "minutes", duration: 60 },
     });
 
-    return NextResponse.json({ ok: true, token: transaction.token, redirectUrl: transaction.redirect_url });
+    try {
+      await supabase
+        .from("orders")
+        .update({
+          promo_code: order.promo_code ? order.promo_code : `MIDTRANS:${midtransOrderId}`,
+        })
+        .eq("id", order.id);
+    } catch (e) {
+      console.warn("Gagal simpan midtransOrderId reference:", e);
+    }
+
+    return NextResponse.json({
+      ok: true,
+      token: transaction.token,
+      redirectUrl: transaction.redirect_url,
+      midtransOrderId,
+    });
   } catch (error) {
     console.error("Midtrans create error:", error);
     return NextResponse.json({ error: "Gagal membuat transaksi Midtrans." }, { status: 500 });

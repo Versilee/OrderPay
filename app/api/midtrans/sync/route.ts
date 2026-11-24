@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { snap } from "@/lib/midtrans";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -16,7 +15,7 @@ export async function POST(request: Request) {
     const supabase = getSupabaseAdmin();
     const { data: order, error } = await supabase
       .from("orders")
-      .select("id, payment_status")
+      .select("id, payment_status, promo_code")
       .eq("id", orderId)
       .maybeSingle();
 
@@ -28,40 +27,62 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, paymentStatus: "paid" });
     }
 
-    const statusResponse = await snap.transaction.notification(orderId).catch(async () => {
-      // Fallback via direct fetch if notification method isn't available
-      const serverKey = process.env.MIDTRANS_SERVER_KEY;
-      if (!serverKey) return null;
-      const auth = Buffer.from(`${serverKey}:`).toString("base64");
-      const res = await fetch(`https://api.sandbox.midtrans.com/v2/${orderId}/status`, {
-        headers: {
-          Authorization: `Basic ${auth}`,
-          Accept: "application/json",
-        },
-      });
-      if (!res.ok) return null;
-      return res.json();
-    });
+    const serverKey = process.env.MIDTRANS_SERVER_KEY;
+    if (!serverKey) {
+      return NextResponse.json({ ok: true, paymentStatus: "unpaid" });
+    }
 
-    const transactionStatus = String(statusResponse?.transaction_status ?? "");
-    const fraudStatus = String(statusResponse?.fraud_status ?? "");
+    const auth = Buffer.from(`${serverKey}:`).toString("base64");
 
-    const isPaid =
-      transactionStatus === "settlement" ||
-      (transactionStatus === "capture" && fraudStatus !== "deny");
+    // Dapatkan ID yang mungkin digunakan saat pendaftaran Midtrans
+    const candidateIds: string[] = [];
+    
+    if (order.promo_code && order.promo_code.startsWith("MIDTRANS:")) {
+      candidateIds.push(order.promo_code.replace("MIDTRANS:", ""));
+    }
+    
+    candidateIds.push(orderId);
+
+    let isPaid = false;
+    let settlementTime: string | undefined = undefined;
+
+    for (const idToCheck of candidateIds) {
+      try {
+        const res = await fetch(`https://api.sandbox.midtrans.com/v2/${idToCheck}/status`, {
+          headers: {
+            Authorization: `Basic ${auth}`,
+            Accept: "application/json",
+          },
+        });
+
+        if (res.ok) {
+          const data = (await res.json()) as Record<string, unknown>;
+          const status = String(data.transaction_status ?? "");
+          const fraud = String(data.fraud_status ?? "");
+
+          if (status === "settlement" || (status === "capture" && fraud !== "deny")) {
+            isPaid = true;
+            settlementTime = String(data.settlement_time ?? new Date().toISOString());
+            break;
+          }
+        }
+      } catch (e) {
+        console.warn(`Gagal cek status Midtrans untuk ID ${idToCheck}:`, e);
+      }
+    }
 
     if (isPaid) {
       const updateData = {
         payment_status: "paid",
         kitchen_status: "received",
-        paid_at: statusResponse?.settlement_time ?? new Date().toISOString(),
+        paid_at: settlementTime ?? new Date().toISOString(),
       };
 
       await supabase.from("orders").update(updateData).eq("id", orderId);
       return NextResponse.json({ ok: true, paymentStatus: "paid", updated: true });
     }
 
-    return NextResponse.json({ ok: true, paymentStatus: "unpaid", transactionStatus });
+    return NextResponse.json({ ok: true, paymentStatus: "unpaid" });
   } catch (error) {
     console.error("Sync error:", error);
     return NextResponse.json({ error: "Gagal menyelaraskan status pembayaran." }, { status: 500 });

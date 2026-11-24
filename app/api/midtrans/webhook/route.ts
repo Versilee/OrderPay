@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { isValidMidtransSignature } from "@/lib/midtrans";
+import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
 
@@ -11,10 +11,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Signature tidak valid." }, { status: 401 });
     }
 
-    const orderId = String(payload.order_id);
+    const rawOrderId = String(payload.order_id ?? "");
+    // Ambil ID pesanan asli Supabase (hapus akhiran -Txxxxxx jika ada)
+    const realOrderId = rawOrderId.split("-T")[0];
+
     const transactionStatus = String(payload.transaction_status ?? "");
     const fraudStatus = String(payload.fraud_status ?? "");
-    const paid = transactionStatus === "settlement" ||
+    const paid =
+      transactionStatus === "settlement" ||
       (transactionStatus === "capture" && fraudStatus !== "deny");
 
     const supabase = getSupabaseAdmin();
@@ -25,7 +29,7 @@ export async function POST(request: Request) {
 
     if (paid) update.paid_at = payload.settlement_time ?? new Date().toISOString();
 
-    const { error } = await supabase.from("orders").update(update).eq("id", orderId);
+    const { error } = await supabase.from("orders").update(update).eq("id", realOrderId);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
     return NextResponse.json({ ok: true });
