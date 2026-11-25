@@ -5,8 +5,14 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json().catch(() => null)) as { orderId?: unknown } | null;
+    const body = (await request.json().catch(() => null)) as {
+      orderId?: unknown;
+      midtransOrderId?: unknown;
+    } | null;
+
     const orderId = typeof body?.orderId === "string" ? body.orderId.trim() : "";
+    const extraMidtransId =
+      typeof body?.midtransOrderId === "string" ? body.midtransOrderId.trim() : "";
 
     if (!orderId) {
       return NextResponse.json({ error: "orderId wajib diisi." }, { status: 400 });
@@ -34,19 +40,37 @@ export async function POST(request: Request) {
 
     const auth = Buffer.from(`${serverKey}:`).toString("base64");
 
-    // Dapatkan ID yang mungkin digunakan saat pendaftaran Midtrans
-    const candidateIds: string[] = [];
-    
-    if (order.promo_code && order.promo_code.startsWith("MIDTRANS:")) {
-      candidateIds.push(order.promo_code.replace("MIDTRANS:", ""));
+    // Kumpulkan seluruh kandidat ID transaksi Midtrans yang pernah dibuat
+    const candidateSet = new Set<string>();
+
+    if (extraMidtransId) {
+      candidateSet.add(extraMidtransId);
     }
-    
-    candidateIds.push(orderId);
+
+    if (order.promo_code) {
+      const matches = order.promo_code.match(/MIDTRANS:([^\s,|]+)/g);
+      if (matches) {
+        for (const m of matches) {
+          candidateSet.add(m.replace("MIDTRANS:", ""));
+        }
+      }
+      if (order.promo_code.includes("MIDTRANS:")) {
+        const parts = order.promo_code.split(/[,|]/);
+        for (const p of parts) {
+          if (p.trim().startsWith("MIDTRANS:")) {
+            candidateSet.add(p.trim().replace("MIDTRANS:", ""));
+          }
+        }
+      }
+    }
+
+    candidateSet.add(orderId);
 
     let isPaid = false;
     let settlementTime: string | undefined = undefined;
 
-    for (const idToCheck of candidateIds) {
+    for (const idToCheck of candidateSet) {
+      if (!idToCheck) continue;
       try {
         const res = await fetch(`https://api.sandbox.midtrans.com/v2/${idToCheck}/status`, {
           headers: {

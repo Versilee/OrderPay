@@ -79,12 +79,19 @@ export async function POST(request: Request) {
       expiry: { unit: "minutes", duration: 60 },
     });
 
+    // Simpan midtransOrderId di promo_code secara presisi agar sync bisa menemukan semua percobaan
     try {
+      let updatedPromo = `MIDTRANS:${midtransOrderId}`;
+      if (order.promo_code) {
+        if (order.promo_code.includes("MIDTRANS:")) {
+          updatedPromo = `${order.promo_code},MIDTRANS:${midtransOrderId}`;
+        } else {
+          updatedPromo = `${order.promo_code}|MIDTRANS:${midtransOrderId}`;
+        }
+      }
       await supabase
         .from("orders")
-        .update({
-          promo_code: order.promo_code ? order.promo_code : `MIDTRANS:${midtransOrderId}`,
-        })
+        .update({ promo_code: updatedPromo })
         .eq("id", order.id);
     } catch (e) {
       console.warn("Gagal simpan midtransOrderId reference:", e);
